@@ -1,4 +1,6 @@
 import argparse
+from typing import Optional
+
 import jsonlines
 import math
 import torch
@@ -117,7 +119,7 @@ def evaluate_ranking_performance(archive_path, test_data_path, cuda_device):
     return metrics
 
 
-def get_recomm_metrics(data_paths:DataPaths, embeddings_path, val_or_test='test', cuda_device=-1):
+def get_recomm_metrics(data_paths:DataPaths, embeddings_path, val_or_test='test', cuda_device=-1, serialization_dir: Optional[str] = None):
     """Run the recommendations task evaluation.
 
     Arguments:
@@ -156,7 +158,8 @@ def get_recomm_metrics(data_paths:DataPaths, embeddings_path, val_or_test='test'
     os.environ['PROP_SCORE_PATH'] = data_paths.recomm_propensity_scores
     os.environ['PAPER_METADATA_PATH'] = data_paths.paper_metadata_recomm
     os.environ['jsonlines_embedding_format'] = "true"
-    serialization_dir = os.path.join(data_paths.base_path, "recomm-tmp")
+    if serialization_dir is None:
+        serialization_dir = os.path.join(data_paths.base_path, "recomm-tmp")
     simpapers_model_path = os.path.join(serialization_dir, "model.tar.gz")
     shutil.rmtree(serialization_dir, ignore_errors=True)
     command = \
